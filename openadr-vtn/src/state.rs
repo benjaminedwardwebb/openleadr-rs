@@ -15,6 +15,8 @@ use axum::{
 use reqwest::StatusCode;
 use std::sync::Arc;
 use tower_http::trace::TraceLayer;
+use utoipa::OpenApi;
+use utoipa_swagger_ui::SwaggerUi;
 
 use crate::api::{auth, event, program, report, resource, user, ven};
 
@@ -80,6 +82,10 @@ impl AppState {
             .fallback(handler_404)
             .layer(middleware::from_fn(method_not_allowed))
             .layer(TraceLayer::new_for_http())
+            .merge(
+                SwaggerUi::new("/docs/ui")
+                    .url("/docs/openapi.json", OpenApiDocument::openapi())
+            )
     }
 
     pub fn into_router(self) -> axum::Router {
@@ -135,3 +141,6 @@ impl FromRef<AppState> for Arc<dyn ResourceCrud> {
         state.storage.resources()
     }
 }
+
+#[derive(OpenApi)]
+struct OpenApiDocument;
