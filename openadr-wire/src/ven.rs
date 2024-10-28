@@ -2,6 +2,7 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
 use std::{fmt::Display, str::FromStr};
+use utoipa::ToSchema;
 use validator::Validate;
 
 use crate::{resource::Resource, values_map::ValuesMap, Identifier, IdentifierError};
@@ -50,7 +51,7 @@ pub enum ObjectType {
     Ven,
 }
 
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize, Hash, Eq, PartialOrd, Ord)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize, Hash, Eq, PartialOrd, Ord, ToSchema)]
 pub struct VenId(pub(crate) Identifier);
 
 impl Display for VenId {

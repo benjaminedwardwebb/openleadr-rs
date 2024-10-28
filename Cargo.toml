@@ -59,4 +59,4 @@ quickcheck = "1.0.3"
 sqlx = { version = "0.8.2", features = ["postgres", "runtime-tokio", "chrono", "migrate", "macros", "json"], default-features = false }
 argon2 = "0.5.3"
 dotenvy = "0.15.7"
-utoipa = "5.1.2"
+utoipa = { version = "5.1.2", features = ["chrono"] }

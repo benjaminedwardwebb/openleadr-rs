@@ -4,6 +4,7 @@ use axum::{
     extract::{Path, State},
     Json,
 };
+use openadr_wire::problem::Problem;
 use openadr_wire::ven::VenId;
 use reqwest::StatusCode;
 use serde::Deserialize;
@@ -36,6 +37,27 @@ fn has_write_permission(User(claims): &User, ven_id: &VenId) -> Result<(), AppEr
     ))
 }
 
+/// search ven resources
+///
+/// Return the ven resources specified by venID specified in path.
+#[utoipa::path(
+    get,
+    path = "/vens/{venID}/resources",
+    responses(
+        (status = 200, description = "OK.", body = Vec<Resource>),
+        (status = 400, description = "Bad Request.", body = Problem),
+        (status = 403, description = "Forbidden.", body = Problem),
+        (status = 404, description = "Not Found.", body = Problem),
+        (status = 500, description = "Internal Server Error.", body = Problem),
+    ),
+    params(
+        ("venID" = VenId, Path, description = "Numeric ID of ven."),
+        ("targetType" = Option<String>, Query, description = "Indicates targeting type, e.g. GROUP"),
+        ("targetValues" = Option<Vec<String>>, Query, description = "List of target values, e.g. group names"),
+        ("skip" = Option<i64>, Query, description = "number of records to skip for pagination.", style = Form, explode, minimum = 0),
+        ("limit" = Option<i64>, Query, description = "maximum number of records to return.", style = Form, explode, minimum = 1, maximum = 50)
+    )
+)]
 pub async fn get_all(
     State(resource_source): State<Arc<dyn ResourceCrud>>,
     Path(ven_id): Path<VenId>,
@@ -52,6 +74,18 @@ pub async fn get_all(
     Ok(Json(resources))
 }
 
+#[utoipa::path(
+    get,
+    path = "/vens/{venID}/resources/{resourceID}",
+    params(
+        ("venID" = str, Path, description = "object ID of the associated ven."),
+        ("resourceID" = str, Path, description = "object ID of the resource.")
+    ),
+    responses(
+        (status = 200, description = "Return the ven resource specified by venID and resourceID specified in path.", body = Resource),
+        (status = 400, description = "TODO", body = Resource)
+    ),
+)]
 pub async fn get(
     State(resource_source): State<Arc<dyn ResourceCrud>>,
     Path((ven_id, id)): Path<(VenId, ResourceId)>,
@@ -75,6 +109,17 @@ pub async fn add(
     Ok((StatusCode::CREATED, Json(ven)))
 }
 
+#[utoipa::path(
+    put,
+    path = "/vens/{venID}/resources/{resourceID}",
+    responses(
+        (status = 200, description = "Update the ven resource specified by venID and resourceID specified in path.", body = Resource)
+    ),
+    params(
+        ("venID" = str, Path, description = "object ID of the associated ven."),
+        ("resourceID" = str, Path, description = "object ID of the resource.")
+    )
+)]
 pub async fn edit(
     State(resource_source): State<Arc<dyn ResourceCrud>>,
     Path((ven_id, id)): Path<(VenId, ResourceId)>,
@@ -89,6 +134,17 @@ pub async fn edit(
     Ok(Json(resource))
 }
 
+#[utoipa::path(
+    delete,
+    path = "/vens/{venID}/resources/{resourceID}",
+    responses(
+        (status = 200, description = "Delete the ven resource specified by venID and resourceID specified in path.", body = Resource)
+    ),
+    params(
+        ("venID" = str, Path, description = "object ID of the associated ven."),
+        ("resourceID" = str, Path, description = "object ID of the resource.")
+    )
+)]
 pub async fn delete(
     State(resource_source): State<Arc<dyn ResourceCrud>>,
     Path((ven_id, id)): Path<(VenId, ResourceId)>,

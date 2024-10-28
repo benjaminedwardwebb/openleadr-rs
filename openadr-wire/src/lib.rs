@@ -10,6 +10,7 @@ pub use event::Event;
 pub use program::Program;
 pub use report::Report;
 use serde::{de::Unexpected, Deserialize, Deserializer, Serialize, Serializer};
+use utoipa::ToSchema;
 pub use ven::Ven;
 
 pub mod event;
@@ -72,7 +73,7 @@ where
 }
 
 /// A string that matches `/^[a-zA-Z0-9_-]*$/` with length in 1..=128
-#[derive(Debug, Clone, Serialize, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[derive(Debug, Clone, Serialize, PartialEq, Eq, Hash, PartialOrd, Ord, ToSchema)]
 pub struct Identifier(#[serde(deserialize_with = "identifier")] String);
 
 impl<'de> Deserialize<'de> for Identifier {

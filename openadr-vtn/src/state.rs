@@ -12,6 +12,7 @@ use axum::{
     response::IntoResponse,
     routing::{delete, get, post},
 };
+use openadr_wire::resource::Resource;
 use reqwest::StatusCode;
 use std::sync::Arc;
 use tower_http::trace::TraceLayer;
@@ -143,4 +144,53 @@ impl FromRef<AppState> for Arc<dyn ResourceCrud> {
 }
 
 #[derive(OpenApi)]
+#[openapi(
+    info(
+        title = "OpenADR 3 API",
+        version = "3.0.1",
+        description = "
+    The OpenADR 3.0.0 API supports energy retailer to energy customer Demand Response programs.
+    The API includes the following capabilities and operations:
+
+    __Manage programs:__
+
+    * Create/Update/Delete a program
+    * Search programs
+
+    __Manage events:__
+
+    * Create/Update/Delete an event
+    * Search events
+
+    __Manage reports:__
+
+    * Create/Update/Delete a report
+    * Search reports
+
+    __Manage subscriptions:__
+
+    * Create/Update/Delete subscriptions to programs, events, and reports
+    * Search subscriptions
+    * Subscriptions allows clients to register a callback URL (webhook) to be notified
+      on the change of state of a resource
+
+    __Manage vens:__
+
+    * Create/Update/Delete vens and ven resources
+    * Search ven and ven resources
+
+    __Manage tokens:__
+
+    * Obtain an access token
+    * This endpoint is provided as a convenience and may be neglected in a commercial implementation
+"
+    ),
+    paths(
+        resource::get_all,
+        resource::get,
+        resource::edit,
+        resource::delete
+    ),
+    components(schemas(Resource)),
+)]
 struct OpenApiDocument;

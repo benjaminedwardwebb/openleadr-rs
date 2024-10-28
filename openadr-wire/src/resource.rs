@@ -2,13 +2,14 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
 use std::{fmt::Display, str::FromStr};
+use utoipa::ToSchema;
 use validator::Validate;
 
 use crate::{values_map::ValuesMap, ven::VenId, Identifier, IdentifierError};
 
 /// A resource is an energy device or system subject to control by a VEN.
 #[skip_serializing_none]
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize, Validate)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize, Validate, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct Resource {
     /// URL safe VTN assigned object ID.
@@ -28,7 +29,7 @@ pub struct Resource {
 }
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize, Validate)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize, Validate, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct ResourceContent {
     /// Used as discriminator, e.g. notification.object
@@ -43,14 +44,14 @@ pub struct ResourceContent {
 }
 
 /// Used as discriminator, e.g. notification.object
-#[derive(Clone, Copy, Debug, Default, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, Default, PartialEq, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum ObjectType {
     #[default]
     Resource,
 }
 
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize, Hash, Eq)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize, Hash, Eq, ToSchema)]
 pub struct ResourceId(pub(crate) Identifier);
 
 impl Display for ResourceId {
