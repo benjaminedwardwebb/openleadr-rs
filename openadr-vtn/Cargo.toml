@@ -42,6 +42,8 @@ thiserror.workspace = true
 sqlx = {workspace = true, optional = true}
 argon2 = {workspace = true, optional = true}
 dotenvy = {workspace = true, optional = true}
+aide = { version = "0.13.4", features = ["axum", "macros"] }
+schemars = "0.8.21"
 
 [dev-dependencies]
 tokio = { workspace = true, features = ["full", "test-util"] }

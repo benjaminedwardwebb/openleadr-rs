@@ -5,6 +5,7 @@ use std::{fmt::Display, str::FromStr};
 use validator::Validate;
 
 use crate::{resource::Resource, values_map::ValuesMap, Identifier, IdentifierError};
+use schemars::JsonSchema;
 
 /// Ven represents a client with the ven role.
 #[skip_serializing_none]
@@ -50,7 +51,7 @@ pub enum ObjectType {
     Ven,
 }
 
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize, Hash, Eq, PartialOrd, Ord)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize, Hash, Eq, PartialOrd, Ord, JsonSchema)]
 pub struct VenId(pub(crate) Identifier);
 
 impl Display for VenId {

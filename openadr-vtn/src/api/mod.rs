@@ -24,10 +24,12 @@ pub(crate) type AppResponse<T> = Result<Json<T>, AppError>;
 #[derive(Debug, Clone)]
 pub(crate) struct ValidatedForm<T>(T);
 
-#[derive(Debug, Clone)]
+use aide::OperationIo;
+
+#[derive(Debug, Clone, OperationIo)]
 pub(crate) struct ValidatedQuery<T>(pub T);
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, OperationIo)]
 pub(crate) struct ValidatedJson<T>(pub T);
 
 #[async_trait]

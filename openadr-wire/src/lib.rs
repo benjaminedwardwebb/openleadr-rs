@@ -22,6 +22,7 @@ pub mod resource;
 pub mod target;
 pub mod values_map;
 pub mod ven;
+use schemars::JsonSchema;
 
 pub mod serde_rfc3339 {
     use super::*;
@@ -72,7 +73,7 @@ where
 }
 
 /// A string that matches `/^[a-zA-Z0-9_-]*$/` with length in 1..=128
-#[derive(Debug, Clone, Serialize, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[derive(Debug, Clone, Serialize, PartialEq, Eq, Hash, PartialOrd, Ord, JsonSchema)]
 pub struct Identifier(#[serde(deserialize_with = "identifier")] String);
 
 impl<'de> Deserialize<'de> for Identifier {

@@ -7,10 +7,10 @@ use crate::{
 };
 use axum::{
     extract::{FromRef, Request},
+    routing::{delete, get, post},
     middleware,
     middleware::Next,
     response::IntoResponse,
-    routing::{delete, get, post},
 };
 use reqwest::StatusCode;
 use std::sync::Arc;
@@ -18,10 +18,27 @@ use tower_http::trace::TraceLayer;
 
 use crate::api::{auth, event, program, report, resource, user, ven};
 
+use aide::{
+    axum::{
+        routing::get as api_get, //, post as api_post},
+        IntoApiResponse,
+        ApiRouter
+    },
+    openapi::{Info, OpenApi},
+};
+use axum::{Extension, Json};
+
 #[derive(Clone, FromRef)]
 pub struct AppState {
     pub storage: Arc<dyn DataSource>,
     pub jwt_manager: Arc<JwtManager>,
+}
+
+// Note that this clones the document on each request.
+// To be more efficient, we could wrap it into an Arc,
+// or even store it as a serialized string.
+async fn serve_api(Extension(api): Extension<OpenApi>) -> impl IntoApiResponse {
+    Json(api)
 }
 
 impl AppState {
@@ -33,7 +50,19 @@ impl AppState {
     }
 
     fn router_without_state() -> axum::Router<Self> {
-        axum::Router::new()
+        let mut api = OpenApi {
+            info: Info {
+                description: Some("an example API".to_string()),
+                ..Info::default()
+            },
+            ..OpenApi::default()
+        };
+        ApiRouter::new()
+            .api_route(
+                "/vens/:ven_id/resources",
+                api_get(resource::get_all).post(resource::add),
+            )
+            .finish_api(&mut api)
             .route("/programs", get(program::get_all).post(program::add))
             .route(
                 "/programs/:id",
@@ -55,10 +84,6 @@ impl AppState {
                 get(ven::get).put(ven::edit).delete(ven::delete),
             )
             .route(
-                "/vens/:ven_id/resources",
-                get(resource::get_all).post(resource::add),
-            )
-            .route(
                 "/vens/:ven_id/resources/:id",
                 get(resource::get)
                     .put(resource::edit)
@@ -77,9 +102,13 @@ impl AppState {
                 "/users/:user_id/:client_id",
                 delete(user::delete_credential),
             )
+            // We'll serve our generated document here.
+            .route("/docs/openapi.json", get(serve_api))
             .fallback(handler_404)
             .layer(middleware::from_fn(method_not_allowed))
             .layer(TraceLayer::new_for_http())
+            // Expose the documentation to the handlers.
+            .layer(Extension(api))
     }
 
     pub fn into_router(self) -> axum::Router {

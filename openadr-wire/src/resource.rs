@@ -6,17 +6,21 @@ use validator::Validate;
 
 use crate::{values_map::ValuesMap, ven::VenId, Identifier, IdentifierError};
 
+use schemars::JsonSchema;
+
 /// A resource is an energy device or system subject to control by a VEN.
 #[skip_serializing_none]
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize, Validate)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize, Validate, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct Resource {
     /// URL safe VTN assigned object ID.
     pub id: ResourceId,
     /// datetime in ISO 8601 format
+    #[schemars(with = "String")]
     #[serde(with = "crate::serde_rfc3339")]
     pub created_date_time: DateTime<Utc>,
     /// datetime in ISO 8601 format
+    #[schemars(with = "String")]
     #[serde(with = "crate::serde_rfc3339")]
     pub modification_date_time: DateTime<Utc>,
     /// URL safe VTN assigned object ID.
@@ -28,7 +32,7 @@ pub struct Resource {
 }
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize, Validate)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize, Validate, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct ResourceContent {
     /// Used as discriminator, e.g. notification.object
@@ -43,14 +47,14 @@ pub struct ResourceContent {
 }
 
 /// Used as discriminator, e.g. notification.object
-#[derive(Clone, Copy, Debug, Default, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum ObjectType {
     #[default]
     Resource,
 }
 
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize, Hash, Eq)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize, Hash, Eq, JsonSchema)]
 pub struct ResourceId(pub(crate) Identifier);
 
 impl Display for ResourceId {

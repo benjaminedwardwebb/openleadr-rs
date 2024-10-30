@@ -15,12 +15,15 @@ use tracing::trace;
 
 use crate::error::AppError;
 
+use schemars::JsonSchema;
+use aide::OperationIo;
+
 pub struct JwtManager {
     encoding_key: EncodingKey,
     decoding_key: DecodingKey,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize, JsonSchema)]
 #[cfg_attr(test, derive(PartialOrd, Ord))]
 #[serde(tag = "role", content = "id")]
 pub enum AuthRole {
@@ -49,7 +52,7 @@ impl AuthRole {
     }
 }
 
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, serde::Serialize, serde::Deserialize, JsonSchema)]
 pub(crate) struct Claims {
     exp: usize,
     nbf: usize,
@@ -192,6 +195,7 @@ impl JwtManager {
 }
 
 /// User claims extracted from the request
+#[derive(OperationIo)]
 pub struct User(pub(crate) Claims);
 
 /// User claims extracted from the request, with the requirement that the user is a business user

@@ -12,8 +12,9 @@ use serde::{Deserialize, Serialize};
 use sqlx::error::DatabaseError;
 use tracing::{error, info, trace, warn};
 use uuid::Uuid;
+use aide::OperationIo;
 
-#[derive(thiserror::Error, Debug)]
+#[derive(thiserror::Error, Debug, OperationIo)]
 pub enum AppError {
     #[error("Invalid request: {0}")]
     Validation(#[from] validator::ValidationErrors),
